@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Purchase Order {{ $purchase->purchase_code ?? '' }}</title>
+    <style>
+        @font-face {
+            font-family: 'Helvetica';
+            font-weight: normal;
+            font-style: normal;
+            font-variant: normal;
+            src: url("font url");
+        }
+
+        body {
+            font-family: Helvetica, sans-serif;
+        }
+
+        h1 {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 14px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        table.data-utama {
+            font-size: 12.5px;
+        }
+
+        table.data-detail {
+            width: 100%;
+            font-size: 13.5px;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #000;
+        }
+
+        table.data-detail thead tr th {
+            border: 1px solid #000;
+        }
+
+        table.data-detail tbody {
+            min-height: 500px;
+        }
+
+        table.data-detail tbody tr td {
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            padding: 3px 5px;
+            font-size: 12px;
+        }
+
+        table.data-note {
+            font-size: 12.5px;
+        }
+
+        table.data-ttd {
+            width: 100%;
+            font-size: 13.5px;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #000;
+        }
+
+        table.data-ttd thead tr th {
+            border: 1px solid #000;
+        }
+
+        table.data-ttd tbody tr td {
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+        }
+
+        .catatan {
+            font-size: 12px;
+        }
+        .border-all td{
+            border: 1px solid #000;
+        }
+
+    </style>
+</head>
+
+<body>
+    <h2>PT. Media Awan Digital Indonesia</h2>
+    <br>
+    <h1 class="text-center">PURCHASE REQUEST FORM</h1>
+    <table class="data-utama">
+        <tr>
+            <td width="90px">Request By</td>
+            <td width="7px">:</td>
+            <td width="300px">{{ $purchase->request->name }}</td>
+            <td width="90px">Request Date</td>
+            <td width="7px">:</td>
+            <td>{{ $purchase->request_date }}</td>
+        </tr>
+        <tr>
+            <td>Div/Dept</td>
+            <td>:</td>
+            <td>{{ $purchase->divisi->nama }}</td>
+            <td>Due Date</td>
+            <td>:</td>
+            <td>{{ $purchase->due_date }}</td>
+        </tr>
+        <tr>
+            <td>Organization</td>
+            <td>:</td>
+            <td>{{ $purchase->institusi->nama }}</td>
+            <td>Leader</td>
+            <td>:</td>
+            <td>{{ $purchase->leader->name }}</td>
+        </tr>
+    </table>
+    <table class="data-detail">
+        <thead>
+            <tr>
+                <th height="20px" width="30px">No.</th>
+                <th width="275px">Description</th>
+                <th width="50px">Quantity</th>
+                <th width="100px">Unit Price</th>
+                <th width="130px">Total (Rp)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($purchase_detail as $key => $data)
+                <tr>
+                    <td class="text-center">{{ ++$key }}</td>
+                    <td>{{ $data->description ?? '' }}</td>
+                    <td class="text-center">{{ $data->quantity ?? 0 }}</td>
+                    <td class="text-right">Rp. {{ number_format($data->unit_price) }}</td>
+                    <td class="text-right">Rp. {{ number_format($data->total) }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td height="360px" width="50px"></td>
+                    <td width="275px"></td>
+                    <td width="70px"></td>
+                    <td width="130px"></td>
+                    <td width="160px"></td>
+                </tr>
+            @endforelse
+            @if (!empty($subtotal))
+                <tr class="border-all">
+                    <td colspan="4" align="right"><b>Total</b></td>
+                    <td align="right">Rp. {{ number_format($subtotal) }} </td>
+                </tr>
+            @endif
+        </tbody>
+    </table>
+    <table class="data-note">
+        <tr>
+            <td height="100px" width="165px" valign="top">Notes (Reason of Request) :</td>
+            <td valign="top">{{ $purchase->note ?? '-' }}</td>
+        </tr>
+    </table>
+    <table class="data-ttd">
+        <thead>
+            <tr>
+                <th height="20px" width="25%">Prepared</th>
+                <th height="20px" width="25%">Checker</th>
+                <th width="25%">Approved Leader</th>
+                <th width="25%">Approved Finance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="text-center" height="120px" width="25%">{{ $purchase->request->name ?? '-' }}</td>
+                <td class="text-center" width="25%">
+                    {{ $purchase->ga->name ?? '-' }}<br><small><i>({{ $purchase->approval->approval_ga_status }})</i></small>
+                </td>
+                <td class="text-center" width="25%">
+                    {{ $purchase->leader->name ?? '-' }}<br><small><i>({{ $purchase->approval->approval_leader_status }})</i></small>
+                </td>
+                <td class="text-center" width="25%">
+                    {{ $purchase->finance->name ?? '-' }}<br><small><i>({{ $purchase->approval->approval_finance_status }})</i></small>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="catatan">
+        <p class="mb-0">
+                            {!! $purchase->approval->approval_leader_status == 'Tidak Disetujui' ? 'Alasan Leader Tidak Menyetujui: ' . $purchase->approval->leader_reason . '<br>' : '' !!}
+                            {!! $purchase->approval->approval_finance_status == 'Tidak Disetujui' ? 'Alasan Finance Tidak Menyetujui: ' . $purchase->approval->finance_reason . '<br><br>' : '' !!}
+                        </p>
+        <p>
+            Note :
+        </p>
+        <ol>
+            <li>Untuk pengajuan event internal maupun external mohon untuk melampirkan detail budget</li>
+            <li>Purchase request maksimal submit setiap hari Rabu dan pembayaran akan dijalakankan di hari
+                Jumat</li>
+        </ol>
+    </div>
+</body>
+
+</html>
